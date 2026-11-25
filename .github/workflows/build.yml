@@ -30,6 +30,14 @@ jobs:
         with:
           name: Artifacts
           path: build/libs/
+      - name: publish release
+        if: success()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --cleanup-tag -y || true
+          gh release create latest build/libs/rustweapons-1.0.0.jar --title "Rust Weapons (latest build)" --notes "Minecraft 1.21.11, Fabric. Needs Fabric API." --target "${{ github.sha }}"
       - name: publish build log
         if: always()
         shell: bash
