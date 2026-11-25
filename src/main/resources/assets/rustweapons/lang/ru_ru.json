@@ -25,5 +25,7 @@
   "item.rustweapons.hv_pistol_ammo": "Пистолетные патроны HV",
   "item.rustweapons.incendiary_pistol_ammo": "Зажигательные пистолетные патроны",
   "item.rustweapons.shotgun_slug": "Пуля 12 калибра",
-  "item.rustweapons.incendiary_shell": "Зажигательная картечь"
+  "item.rustweapons.incendiary_shell": "Зажигательная картечь",
+  "key.rustweapons.reload": "Перезарядка оружия",
+  "key.category.rustweapons.main": "Rust Weapons"
 }

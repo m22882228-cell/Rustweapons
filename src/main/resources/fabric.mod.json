@@ -4,11 +4,18 @@
 	"version": "${version}",
 	"name": "Rust Weapons",
 	"description": "Weapons from the game Rust: AK-47, LR-300, MP5A4, Thompson, pistols, revolvers, bolt action rifle and pump shotgun with magazines, reloading and recoil.",
-	"authors": ["m22882228-cell"],
+	"authors": [
+		"m22882228-cell"
+	],
 	"license": "All-Rights-Reserved",
 	"environment": "*",
 	"entrypoints": {
-		"main": ["com.rustweapons.RustWeapons"]
+		"main": [
+			"com.rustweapons.RustWeapons"
+		],
+		"client": [
+			"com.rustweapons.RustWeaponsClient"
+		]
 	},
 	"depends": {
 		"fabricloader": ">=0.20.1",

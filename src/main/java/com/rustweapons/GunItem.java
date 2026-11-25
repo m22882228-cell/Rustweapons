@@ -2,6 +2,7 @@ package com.rustweapons;
 
 import com.google.common.base.Suppliers;
 import java.util.List;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -85,58 +86,63 @@ public class GunItem extends Item implements GeoItem {
 
 	// ---------------------------------------------------------------- use / shoot
 
+	/** Right click is "aim down sights", which the client handles. Nothing to do here. */
 	@Override
 	public InteractionResult use(Level level, Player player, InteractionHand hand) {
-		ItemStack stack = player.getItemInHand(hand);
-		int ammo = stack.getOrDefault(RustItems.AMMO, 0);
-
-		// Sneak + right click = manual reload
-		if (player.isShiftKeyDown()) {
-			if (level instanceof ServerLevel sl && player instanceof ServerPlayer sp) {
-				reload(sl, sp, stack);
-			}
-			return InteractionResult.CONSUME;
-		}
-
-		if (player.getCooldowns().isOnCooldown(stack)) {
-			return InteractionResult.FAIL;
-		}
-
-		// Empty magazine: try to reload automatically
-		if (ammo <= 0) {
-			player.getCooldowns().addCooldown(stack, 10);
-			if (level instanceof ServerLevel sl && player instanceof ServerPlayer sp) {
-				reload(sl, sp, stack);
-			}
-			return InteractionResult.FAIL;
-		}
-
-		if (level.isClientSide()) {
-			// Recoil: kick the camera up (and a little sideways) on the client
-			RandomSource rnd = level.getRandom();
-			float kick = stats.recoil() * (0.8f + rnd.nextFloat() * 0.4f);
-			player.setXRot(Mth.clamp(player.getXRot() - kick, -90.0f, 90.0f));
-			player.setYRot(player.getYRot() + (rnd.nextFloat() - 0.5f) * kick * 0.6f);
-			player.getCooldowns().addCooldown(stack, stats.cooldown());
-			return InteractionResult.SUCCESS;
-		}
-
-		if (level instanceof ServerLevel sl && player instanceof ServerPlayer sp) {
-			int kind = Mth.clamp(stack.getOrDefault(RustItems.AMMO_KIND, 0), 0, stats.ammo().length - 1);
-			AmmoType type = stats.ammo()[kind];
-			stack.set(RustItems.AMMO, ammo - 1);
-			player.getCooldowns().addCooldown(stack, stats.cooldown());
-			fire(sl, sp, type);
-			triggerAnim(sp, GeoItem.getOrAssignId(stack, sl), "actions", "shoot");
-			sp.displayClientMessage(Component.literal((ammo - 1) + " / " + stats.magSize() + "   |   " + countAmmo(sp, type.item()) + "   ")
-					.append(Component.translatable(type.item().getDescriptionId())), true);
-		}
-		return InteractionResult.SUCCESS;
+		return InteractionResult.CONSUME;
 	}
 
-	private void fire(ServerLevel level, ServerPlayer player, AmmoType type) {
+	/** Full-auto guns keep shooting while the fire button is held. */
+	public boolean isAutomatic() {
+		return stats.cooldown() <= 3;
+	}
+
+	/** Field-of-view factor while aiming (smaller = more zoom). */
+	public float zoom() {
+		if (stats.range() >= 200) return 0.3f;
+		if (stats.range() >= 160) return 0.45f;
+		return 0.7f;
+	}
+
+	/** Server side: the client is holding/clicking the fire button. */
+	public void handleFire(ServerPlayer player, boolean aiming) {
+		ItemStack stack = player.getMainHandItem();
+		if (stack.getItem() != this || !(player.level() instanceof ServerLevel level)) return;
+		if (player.getCooldowns().isOnCooldown(stack)) return;
+
+		int ammo = stack.getOrDefault(RustItems.AMMO, 0);
+		if (ammo <= 0) {
+			// empty magazine: try to reload automatically
+			player.getCooldowns().addCooldown(stack, 10);
+			reload(level, player, stack);
+			return;
+		}
+
+		int kind = Mth.clamp(stack.getOrDefault(RustItems.AMMO_KIND, 0), 0, stats.ammo().length - 1);
+		AmmoType type = stats.ammo()[kind];
+		stack.set(RustItems.AMMO, ammo - 1);
+		player.getCooldowns().addCooldown(stack, stats.cooldown());
+		fire(level, player, type, aiming);
+		triggerAnim(player, GeoItem.getOrAssignId(stack, level), "actions", "shoot");
+		player.displayClientMessage(Component.literal((ammo - 1) + " / " + stats.magSize() + "   |   " + countAmmo(player, type.item()) + "   ")
+				.append(Component.translatable(type.item().getDescriptionId())), true);
+
 		RandomSource rnd = level.getRandom();
-		float spreadDeg = stats.spread() * type.spreadMult();
+		float kick = stats.recoil() * (aiming ? 0.7f : 1.0f) * (0.8f + rnd.nextFloat() * 0.4f);
+		ServerPlayNetworking.send(player, new RecoilPayload(kick, (rnd.nextFloat() - 0.5f) * kick * 0.6f));
+	}
+
+	/** Server side: the reload key was pressed. */
+	public void handleReload(ServerPlayer player) {
+		ItemStack stack = player.getMainHandItem();
+		if (stack.getItem() != this || !(player.level() instanceof ServerLevel level)) return;
+		if (player.getCooldowns().isOnCooldown(stack)) return;
+		reload(level, player, stack);
+	}
+
+	private void fire(ServerLevel level, ServerPlayer player, AmmoType type, boolean aiming) {
+		RandomSource rnd = level.getRandom();
+		float spreadDeg = stats.spread() * type.spreadMult() * (aiming ? 0.4f : 1.0f);
 		float damage = stats.damage() * type.damageMult();
 		double range = stats.range() * type.rangeMult();
 		int pellets = type.pelletOverride() > 0 ? type.pelletOverride() : stats.pellets();

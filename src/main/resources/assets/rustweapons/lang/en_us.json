@@ -25,5 +25,7 @@
   "item.rustweapons.hv_pistol_ammo": "HV Pistol Bullet",
   "item.rustweapons.incendiary_pistol_ammo": "Incendiary Pistol Bullet",
   "item.rustweapons.shotgun_slug": "12 Gauge Slug",
-  "item.rustweapons.incendiary_shell": "Incendiary Shell"
+  "item.rustweapons.incendiary_shell": "Incendiary Shell",
+  "key.rustweapons.reload": "Reload weapon",
+  "key.category.rustweapons.main": "Rust Weapons"
 }
