@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "rustweapons:rifle_ammo",
+    "minecraft:blaze_powder"
+  ],
+  "result": {
+    "id": "rustweapons:incendiary_rifle_ammo",
+    "count": 2
+  }
+}

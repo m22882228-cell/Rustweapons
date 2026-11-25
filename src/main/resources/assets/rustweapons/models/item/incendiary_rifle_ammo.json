@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rustweapons:item/incendiary_rifle_ammo"
+  }
+}

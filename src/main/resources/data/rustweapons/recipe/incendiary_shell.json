@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "rustweapons:shotgun_shell",
+    "minecraft:blaze_powder"
+  ],
+  "result": {
+    "id": "rustweapons:incendiary_shell",
+    "count": 2
+  }
+}

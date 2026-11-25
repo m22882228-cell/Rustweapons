@@ -82,16 +82,23 @@ public class GunItem extends Item {
 		}
 
 		if (level instanceof ServerLevel sl && player instanceof ServerPlayer sp) {
+			int kind = Mth.clamp(stack.getOrDefault(RustItems.AMMO_KIND, 0), 0, stats.ammo().length - 1);
+			AmmoType type = stats.ammo()[kind];
 			stack.set(RustItems.AMMO, ammo - 1);
 			player.getCooldowns().addCooldown(stack, stats.cooldown());
-			fire(sl, sp);
-			sp.displayClientMessage(Component.literal((ammo - 1) + " / " + stats.magSize() + "   |   " + countAmmo(sp)), true);
+			fire(sl, sp, type);
+			sp.displayClientMessage(Component.literal((ammo - 1) + " / " + stats.magSize() + "   |   " + countAmmo(sp, type.item()) + "   ")
+					.append(Component.translatable(type.item().getDescriptionId())), true);
 		}
 		return InteractionResult.SUCCESS;
 	}
 
-	private void fire(ServerLevel level, ServerPlayer player) {
+	private void fire(ServerLevel level, ServerPlayer player, AmmoType type) {
 		RandomSource rnd = level.getRandom();
+		float spreadDeg = stats.spread() * type.spreadMult();
+		float damage = stats.damage() * type.damageMult();
+		double range = stats.range() * type.rangeMult();
+		int pellets = type.pelletOverride() > 0 ? type.pelletOverride() : stats.pellets();
 		Vec3 eye = player.getEyePosition();
 
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), CRACK, SoundSource.PLAYERS, 1.6f, stats.pitch());
@@ -101,11 +108,11 @@ public class GunItem extends Item {
 		level.sendParticles(ParticleTypes.SMOKE, eye.x + look.x * 1.2, eye.y + look.y * 1.2 - 0.15, eye.z + look.z * 1.2,
 				2, 0.02, 0.02, 0.02, 0.01);
 
-		for (int i = 0; i < stats.pellets(); i++) {
-			float yaw = player.getYRot() + (rnd.nextFloat() - 0.5f) * 2.0f * stats.spread();
-			float pitch = player.getXRot() + (rnd.nextFloat() - 0.5f) * 2.0f * stats.spread();
+		for (int i = 0; i < pellets; i++) {
+			float yaw = player.getYRot() + (rnd.nextFloat() - 0.5f) * 2.0f * spreadDeg;
+			float pitch = player.getXRot() + (rnd.nextFloat() - 0.5f) * 2.0f * spreadDeg;
 			Vec3 dir = direction(yaw, pitch);
-			ray(level, player, eye, dir);
+			ray(level, player, eye, dir, range, damage, type.fireTicks());
 		}
 	}
 
@@ -117,8 +124,7 @@ public class GunItem extends Item {
 	}
 
 	/** Hitscan bullet: stops at the first block, hits the first living entity on the way. */
-	private void ray(ServerLevel level, ServerPlayer player, Vec3 eye, Vec3 dir) {
-		double range = stats.range();
+	private void ray(ServerLevel level, ServerPlayer player, Vec3 eye, Vec3 dir, double range, float baseDamage, int fireTicks) {
 		Vec3 end = eye.add(dir.scale(range));
 
 		BlockHitResult blockHit = level.clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
@@ -150,11 +156,12 @@ public class GunItem extends Item {
 		}
 
 		if (best != null) {
-			float damage = stats.damage();
+			float damage = baseDamage;
 			boolean head = bestPos.y > best.getY() + best.getBbHeight() * 0.82;
 			if (head) damage *= 1.5f;
 			best.invulnerableTime = 0; // allow fast successive hits
 			best.hurtServer(level, level.damageSources().playerAttack(player), damage);
+			if (fireTicks > 0) best.setRemainingFireTicks(fireTicks);
 			level.sendParticles(ParticleTypes.CRIT, bestPos.x, bestPos.y, bestPos.z, head ? 8 : 4, 0.1, 0.1, 0.1, 0.15);
 			level.playSound(null, bestPos.x, bestPos.y, bestPos.z, HITMARKER, SoundSource.PLAYERS, 0.5f, head ? 1.6f : 1.2f);
 		} else if (hitBlock) {
@@ -170,13 +177,16 @@ public class GunItem extends Item {
 		int need = stats.magSize() - mag;
 		if (need <= 0) return;
 
-		int taken = takeAmmo(player, need);
+		// a non-empty magazine keeps its ammo kind; an empty one takes the first kind found in the inventory
+		int kind = mag > 0 ? Mth.clamp(stack.getOrDefault(RustItems.AMMO_KIND, 0), 0, stats.ammo().length - 1) : pickKind(player);
+		int taken = kind < 0 ? 0 : takeAmmo(player, need, stats.ammo()[kind].item());
 		if (taken <= 0) {
 			player.displayClientMessage(Component.translatable("message.rustweapons.no_ammo"), true);
 			level.playSound(null, player.getX(), player.getY(), player.getZ(), EMPTY, SoundSource.PLAYERS, 0.8f, 1.6f);
 			return;
 		}
 
+		stack.set(RustItems.AMMO_KIND, kind);
 		stack.set(RustItems.AMMO, mag + taken);
 		player.getCooldowns().addCooldown(stack, stats.reloadTicks());
 		player.displayClientMessage(Component.translatable("message.rustweapons.reloading"), true);
@@ -185,14 +195,21 @@ public class GunItem extends Item {
 				level.playSound(null, player.getX(), player.getY(), player.getZ(), RELOAD_END, SoundSource.PLAYERS, 0.9f, 1.5f));
 	}
 
+	private int pickKind(ServerPlayer player) {
+		for (int k = 0; k < stats.ammo().length; k++) {
+			if (countAmmo(player, stats.ammo()[k].item()) > 0) return k;
+		}
+		return player.getAbilities().instabuild ? 0 : -1;
+	}
+
 	/** Takes up to {@code need} ammo items from the inventory; creative players reload for free. */
-	private int takeAmmo(ServerPlayer player, int need) {
+	private int takeAmmo(ServerPlayer player, int need, Item ammoItem) {
 		if (player.getAbilities().instabuild) return need;
 		int taken = 0;
 		var inv = player.getInventory();
 		for (int i = 0; i < inv.getContainerSize() && taken < need; i++) {
 			ItemStack s = inv.getItem(i);
-			if (s.is(stats.ammo())) {
+			if (s.is(ammoItem)) {
 				int n = Math.min(s.getCount(), need - taken);
 				s.shrink(n);
 				taken += n;
@@ -201,13 +218,13 @@ public class GunItem extends Item {
 		return taken;
 	}
 
-	private int countAmmo(ServerPlayer player) {
+	private int countAmmo(ServerPlayer player, Item ammoItem) {
 		if (player.getAbilities().instabuild) return 999;
 		int total = 0;
 		var inv = player.getInventory();
 		for (int i = 0; i < inv.getContainerSize(); i++) {
 			ItemStack s = inv.getItem(i);
-			if (s.is(stats.ammo())) total += s.getCount();
+			if (s.is(ammoItem)) total += s.getCount();
 		}
 		return total;
 	}

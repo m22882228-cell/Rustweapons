@@ -13,5 +13,17 @@
   "item.rustweapons.pistol_ammo": "Пистолетные патроны",
   "item.rustweapons.shotgun_shell": "Картечь 12 калибра",
   "message.rustweapons.no_ammo": "Нет патронов",
-  "message.rustweapons.reloading": "Перезарядка..."
+  "message.rustweapons.reloading": "Перезарядка...",
+  "item.rustweapons.sar": "Самозарядная винтовка SAR",
+  "item.rustweapons.m249": "Пулемёт M249",
+  "item.rustweapons.custom_smg": "Кастомный ПП",
+  "item.rustweapons.double_barrel": "Двуствольный дробовик",
+  "item.rustweapons.waterpipe": "Дробовик из трубы",
+  "item.rustweapons.eoka": "Пистолет Eoka",
+  "item.rustweapons.hv_rifle_ammo": "Патроны 5.56 HV",
+  "item.rustweapons.incendiary_rifle_ammo": "Зажигательные патроны 5.56",
+  "item.rustweapons.hv_pistol_ammo": "Пистолетные патроны HV",
+  "item.rustweapons.incendiary_pistol_ammo": "Зажигательные пистолетные патроны",
+  "item.rustweapons.shotgun_slug": "Пуля 12 калибра",
+  "item.rustweapons.incendiary_shell": "Зажигательная картечь"
 }

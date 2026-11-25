@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "rustweapons:shotgun_shell",
+    "minecraft:iron_nugget"
+  ],
+  "result": {
+    "id": "rustweapons:shotgun_slug",
+    "count": 2
+  }
+}
