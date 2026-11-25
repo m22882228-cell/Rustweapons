@@ -1,6 +1,9 @@
 {
+ "model": {
+  "type": "minecraft:special",
+  "base": "rustweapons:item/python",
   "model": {
-    "type": "minecraft:model",
-    "model": "rustweapons:item/python"
+   "type": "geckolib:geckolib"
   }
+ }
 }

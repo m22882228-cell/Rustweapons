@@ -1,6 +1,9 @@
 {
+ "model": {
+  "type": "minecraft:special",
+  "base": "rustweapons:item/pump_shotgun",
   "model": {
-    "type": "minecraft:model",
-    "model": "rustweapons:item/pump_shotgun"
+   "type": "geckolib:geckolib"
   }
+ }
 }

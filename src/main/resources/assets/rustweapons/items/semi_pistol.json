@@ -1,6 +1,9 @@
 {
+ "model": {
+  "type": "minecraft:special",
+  "base": "rustweapons:item/semi_pistol",
   "model": {
-    "type": "minecraft:model",
-    "model": "rustweapons:item/semi_pistol"
+   "type": "geckolib:geckolib"
   }
+ }
 }

@@ -1,6 +1,9 @@
 {
+ "model": {
+  "type": "minecraft:special",
+  "base": "rustweapons:item/waterpipe",
   "model": {
-    "type": "minecraft:model",
-    "model": "rustweapons:item/waterpipe"
+   "type": "geckolib:geckolib"
   }
+ }
 }

@@ -4,6 +4,17 @@ plugins {
 }
 
 repositories {
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = "Modrinth"
+				url = "https://api.modrinth.com/maven"
+			}
+		}
+		filter {
+			includeGroup "maven.modrinth"
+		}
+	}
 }
 
 dependencies {
@@ -11,6 +22,8 @@ dependencies {
 	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	// GeckoLib 5.4.5 for Fabric 1.21.11 (Modrinth project 8BmcQJ2H, version G1BvHQDL)
+	modImplementation "maven.modrinth:8BmcQJ2H:G1BvHQDL"
 }
 
 processResources {

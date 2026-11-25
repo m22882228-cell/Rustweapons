@@ -1,6 +1,18 @@
 package com.rustweapons;
 
+import com.google.common.base.Suppliers;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.client.GeoRenderProvider;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animatable.manager.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.animation.object.PlayState;
+import software.bernie.geckolib.renderer.GeoItemRenderer;
+import software.bernie.geckolib.util.GeckoLibUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.Identifier;
@@ -24,7 +36,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class GunItem extends Item {
+public class GunItem extends Item implements GeoItem {
 	private static final SoundEvent CRACK = sound("entity.firework_rocket.blast");
 	private static final SoundEvent THUMP = sound("entity.generic.explode");
 	private static final SoundEvent EMPTY = sound("block.dispenser.fail");
@@ -33,10 +45,38 @@ public class GunItem extends Item {
 	private static final SoundEvent HITMARKER = sound("entity.arrow.hit_player");
 
 	private final GunStats stats;
+	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
 	public GunItem(Properties properties, GunStats stats) {
 		super(properties);
 		this.stats = stats;
+		GeoItem.registerSyncedAnimatable(this);
+	}
+
+	// ---------------------------------------------------------------- GeckoLib (3D model + animations)
+
+	@Override
+	public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+		consumer.accept(new GeoRenderProvider() {
+			private final Supplier<GeoItemRenderer<GunItem>> renderer = Suppliers.memoize(() -> new GeoItemRenderer<>(GunItem.this));
+
+			@Override
+			public GeoItemRenderer<GunItem> getGeoItemRenderer() {
+				return this.renderer.get();
+			}
+		});
+	}
+
+	@Override
+	public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+		controllers.add(new AnimationController<GunItem>("actions", state -> PlayState.STOP)
+				.triggerableAnim("shoot", RawAnimation.begin().thenPlay("gun.shoot"))
+				.triggerableAnim("reload", RawAnimation.begin().thenPlay("gun.reload")));
+	}
+
+	@Override
+	public AnimatableInstanceCache getAnimatableInstanceCache() {
+		return this.geoCache;
 	}
 
 	private static SoundEvent sound(String path) {
@@ -87,6 +127,7 @@ public class GunItem extends Item {
 			stack.set(RustItems.AMMO, ammo - 1);
 			player.getCooldowns().addCooldown(stack, stats.cooldown());
 			fire(sl, sp, type);
+			triggerAnim(sp, GeoItem.getOrAssignId(stack, sl), "actions", "shoot");
 			sp.displayClientMessage(Component.literal((ammo - 1) + " / " + stats.magSize() + "   |   " + countAmmo(sp, type.item()) + "   ")
 					.append(Component.translatable(type.item().getDescriptionId())), true);
 		}
@@ -188,6 +229,7 @@ public class GunItem extends Item {
 
 		stack.set(RustItems.AMMO_KIND, kind);
 		stack.set(RustItems.AMMO, mag + taken);
+		triggerAnim(player, GeoItem.getOrAssignId(stack, level), "actions", "reload");
 		player.getCooldowns().addCooldown(stack, stats.reloadTicks());
 		player.displayClientMessage(Component.translatable("message.rustweapons.reloading"), true);
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), RELOAD_START, SoundSource.PLAYERS, 0.9f, 1.3f);

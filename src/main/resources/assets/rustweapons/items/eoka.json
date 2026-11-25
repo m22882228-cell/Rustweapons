@@ -1,6 +1,9 @@
 {
+ "model": {
+  "type": "minecraft:special",
+  "base": "rustweapons:item/eoka",
   "model": {
-    "type": "minecraft:model",
-    "model": "rustweapons:item/eoka"
+   "type": "geckolib:geckolib"
   }
+ }
 }

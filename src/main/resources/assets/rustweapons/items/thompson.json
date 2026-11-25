@@ -1,6 +1,9 @@
 {
+ "model": {
+  "type": "minecraft:special",
+  "base": "rustweapons:item/thompson",
   "model": {
-    "type": "minecraft:model",
-    "model": "rustweapons:item/thompson"
+   "type": "geckolib:geckolib"
   }
+ }
 }

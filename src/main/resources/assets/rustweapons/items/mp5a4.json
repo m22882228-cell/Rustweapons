@@ -1,6 +1,9 @@
 {
+ "model": {
+  "type": "minecraft:special",
+  "base": "rustweapons:item/mp5a4",
   "model": {
-    "type": "minecraft:model",
-    "model": "rustweapons:item/mp5a4"
+   "type": "geckolib:geckolib"
   }
+ }
 }

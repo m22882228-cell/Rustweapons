@@ -1,6 +1,9 @@
 {
+ "model": {
+  "type": "minecraft:special",
+  "base": "rustweapons:item/revolver",
   "model": {
-    "type": "minecraft:model",
-    "model": "rustweapons:item/revolver"
+   "type": "geckolib:geckolib"
   }
+ }
 }

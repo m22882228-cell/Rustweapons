@@ -1,6 +1,9 @@
 {
+ "model": {
+  "type": "minecraft:special",
+  "base": "rustweapons:item/sar",
   "model": {
-    "type": "minecraft:model",
-    "model": "rustweapons:item/sar"
+   "type": "geckolib:geckolib"
   }
+ }
 }

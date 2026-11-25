@@ -1,6 +1,9 @@
 {
+ "model": {
+  "type": "minecraft:special",
+  "base": "rustweapons:item/m39",
   "model": {
-    "type": "minecraft:model",
-    "model": "rustweapons:item/m39"
+   "type": "geckolib:geckolib"
   }
+ }
 }

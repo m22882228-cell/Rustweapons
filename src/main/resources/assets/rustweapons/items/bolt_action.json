@@ -1,6 +1,9 @@
 {
+ "model": {
+  "type": "minecraft:special",
+  "base": "rustweapons:item/bolt_action",
   "model": {
-    "type": "minecraft:model",
-    "model": "rustweapons:item/bolt_action"
+   "type": "geckolib:geckolib"
   }
+ }
 }

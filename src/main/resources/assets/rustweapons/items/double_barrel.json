@@ -1,6 +1,9 @@
 {
+ "model": {
+  "type": "minecraft:special",
+  "base": "rustweapons:item/double_barrel",
   "model": {
-    "type": "minecraft:model",
-    "model": "rustweapons:item/double_barrel"
+   "type": "geckolib:geckolib"
   }
+ }
 }
