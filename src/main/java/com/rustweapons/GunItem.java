@@ -156,7 +156,7 @@ public class GunItem extends Item {
 			best.invulnerableTime = 0; // allow fast successive hits
 			best.hurtServer(level, level.damageSources().playerAttack(player), damage);
 			level.sendParticles(ParticleTypes.CRIT, bestPos.x, bestPos.y, bestPos.z, head ? 8 : 4, 0.1, 0.1, 0.1, 0.15);
-			player.playNotifySound(HITMARKER, SoundSource.PLAYERS, 0.4f, head ? 1.6f : 1.2f);
+			level.playSound(null, bestPos.x, bestPos.y, bestPos.z, HITMARKER, SoundSource.PLAYERS, 0.5f, head ? 1.6f : 1.2f);
 		} else if (hitBlock) {
 			Vec3 p = blockHit.getLocation();
 			level.sendParticles(ParticleTypes.SMOKE, p.x, p.y, p.z, 3, 0.05, 0.05, 0.05, 0.02);
