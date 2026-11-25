@@ -1,0 +1,17 @@
+{
+  "item.rustweapons.ak47": "Автомат АК-47",
+  "item.rustweapons.lr300": "Автомат LR-300",
+  "item.rustweapons.mp5a4": "MP5A4",
+  "item.rustweapons.thompson": "Томпсон",
+  "item.rustweapons.semi_pistol": "Пистолет M92",
+  "item.rustweapons.revolver": "Револьвер",
+  "item.rustweapons.python": "Револьвер Python",
+  "item.rustweapons.bolt_action": "Снайперская винтовка L96",
+  "item.rustweapons.m39": "Винтовка M39 EBR",
+  "item.rustweapons.pump_shotgun": "Дробовик SPAS-12",
+  "item.rustweapons.rifle_ammo": "Патроны 5.56",
+  "item.rustweapons.pistol_ammo": "Пистолетные патроны",
+  "item.rustweapons.shotgun_shell": "Картечь 12 калибра",
+  "message.rustweapons.no_ammo": "Нет патронов",
+  "message.rustweapons.reloading": "Перезарядка..."
+}

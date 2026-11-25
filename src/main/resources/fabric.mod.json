@@ -1,0 +1,19 @@
+{
+	"schemaVersion": 1,
+	"id": "rustweapons",
+	"version": "${version}",
+	"name": "Rust Weapons",
+	"description": "Weapons from the game Rust: AK-47, LR-300, MP5A4, Thompson, pistols, revolvers, bolt action rifle and pump shotgun with magazines, reloading and recoil.",
+	"authors": ["m22882228-cell"],
+	"license": "All-Rights-Reserved",
+	"environment": "*",
+	"entrypoints": {
+		"main": ["com.rustweapons.RustWeapons"]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}

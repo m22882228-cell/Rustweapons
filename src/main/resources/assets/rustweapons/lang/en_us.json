@@ -1,0 +1,17 @@
+{
+  "item.rustweapons.ak47": "AK-47 Assault Rifle",
+  "item.rustweapons.lr300": "LR-300 Assault Rifle",
+  "item.rustweapons.mp5a4": "MP5A4",
+  "item.rustweapons.thompson": "Thompson",
+  "item.rustweapons.semi_pistol": "M92 Pistol",
+  "item.rustweapons.revolver": "Revolver",
+  "item.rustweapons.python": "Python Revolver",
+  "item.rustweapons.bolt_action": "L96 Sniper Rifle",
+  "item.rustweapons.m39": "M39 EBR",
+  "item.rustweapons.pump_shotgun": "SPAS-12 Shotgun",
+  "item.rustweapons.rifle_ammo": "5.56 Rifle Ammo",
+  "item.rustweapons.pistol_ammo": "Pistol Bullet",
+  "item.rustweapons.shotgun_shell": "12 Gauge Buckshot",
+  "message.rustweapons.no_ammo": "No ammo",
+  "message.rustweapons.reloading": "Reloading..."
+}

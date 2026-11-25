@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "III",
+    "PPI",
+    "P  "
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "P": "#minecraft:planks"
+  },
+  "result": {
+    "id": "rustweapons:pump_shotgun",
+    "count": 1
+  }
+}
